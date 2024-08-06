@@ -3,8 +3,13 @@
 Bare minimum DAG implementation for in-process sorting of jobs with
 dependency injection. Runs jobs in topological order.
 
+Install:
+`pip install minidag`
+
 Usage:
 ```python
+from minidag import MiniDAG
+
 dag = MiniDAG()
 
 @dag.job()
