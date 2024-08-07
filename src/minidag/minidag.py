@@ -39,7 +39,6 @@ class MiniDAG:
 
     def __init__(self):
         self.graph = OrderedDict()
-        self.context = {}
         self.jobs = {}
 
     def job(self):
@@ -65,14 +64,15 @@ class MiniDAG:
         return decorator
 
     def run(self, **kwargs):
+        context = {}
         for k, v in kwargs.items():
-            self.context[k] = v
+            context[k] = v
 
         ts = TopologicalSorter(self.graph)
         jobs_in_order = reversed(tuple(ts.static_order()))
 
         for job in jobs_in_order:
-            if job in self.context:
+            if job in context:
                 # input values added via kwargs to run
                 continue
 
@@ -83,8 +83,8 @@ class MiniDAG:
             func = self.jobs[job]
             spec = inspect.getfullargspec(func)
             arg_names = spec[0]
-            kwargs = {arg: self.context[arg] for arg in arg_names}
+            kwargs = {arg: context[arg] for arg in arg_names}
             result = func(**kwargs)
-            self.context[job] = result
+            context[job] = result
 
-        return self.context
+        return context
